@@ -9,6 +9,7 @@ import android.os.Build;
 import android.text.SpannableString;
 import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
+import android.util.Log;
 import android.view.GestureDetector;
 import android.view.Menu;
 import android.view.MenuItem;
@@ -53,7 +54,11 @@ public class ContextMenuView extends ReactViewGroup implements View.OnCreateCont
             public boolean onSingleTapConfirmed(MotionEvent e) {
                 if (dropdownMenuMode && !disabled) {
                     if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.N) {
-                        showContextMenu(e.getX(), e.getY());
+                        if (actions.size() == 1) {
+                            showContextMenu(-120, -200);
+                        } else {
+                            showContextMenu(-120, actions.size() * -160);
+                        }
                     }
                 }
                 return super.onSingleTapConfirmed(e);
@@ -86,20 +91,6 @@ public class ContextMenuView extends ReactViewGroup implements View.OnCreateCont
     public boolean onTouchEvent(MotionEvent ev) {
         gestureDetector.onTouchEvent(ev);
         return true;
-    }
-
-    @Override
-    protected void onDetachedFromWindow() {
-        super.onDetachedFromWindow();
-        if (cancelled) {
-            emitCancelEvent();
-        }
-    }
-
-    private void emitCancelEvent() {
-        ReactContext reactContext = (ReactContext) getContext();
-        WritableMap event = Arguments.createMap();
-        reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "onCancel", event);
     }
 
     @Override
