@@ -89,6 +89,20 @@ public class ContextMenuView extends ReactViewGroup implements View.OnCreateCont
     }
 
     @Override
+    protected void onDetachedFromWindow() {
+        super.onDetachedFromWindow();
+        if (cancelled) {
+            emitCancelEvent();
+        }
+    }
+
+    private void emitCancelEvent() {
+        ReactContext reactContext = (ReactContext) getContext();
+        WritableMap event = Arguments.createMap();
+        reactContext.getJSModule(RCTEventEmitter.class).receiveEvent(getId(), "onCancel", event);
+    }
+
+    @Override
     public void onCreateContextMenu(ContextMenu contextMenu, View view, ContextMenu.ContextMenuInfo contextMenuInfo) {
         contextMenu.clear();
         setMenuIconDisplay(contextMenu, true);
